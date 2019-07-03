@@ -1,18 +1,16 @@
-
+import 'dart:io';
 import 'dart:isolate';
+
+import 'TestThread.dart';
 
 main(List<String> args) async {
   var receivePort = new ReceivePort();
-  Isolate thread = await Isolate.spawn(threadTest, receivePort.sendPort);
 
-  receivePort.listen((data){
-    print("Data: $data in Thread ${Isolate.current.debugName}");
+  receivePort.listen((data) {
+    sleep(Duration(milliseconds: 100));
+    print("Received data: $data in Thread ${Isolate.current.debugName}");
   });
 
-}
-
-threadTest(SendPort sendPort) async {
-  var port = ReceivePort();
-  sendPort.send("Message from ${Isolate.current.debugName}");
-
+  TestThread thread = TestThread(receivePort);
+  thread.start();
 }
